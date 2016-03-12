@@ -24,7 +24,7 @@ grammar_recitation = [
 ]
 
 
-## test grammar - E has nullable start (T)
+#### test grammar - E has nullable start (T)
 ##grammar_recitation = [
 ##    (S, (ID, ASSIGN, E)),              # S -> id := E
 ##    (S, (IF, LP, E, RP, S, ELSE, S)),  # S -> if (E) S else S
@@ -156,9 +156,28 @@ def calculate_select(terminals, nonterminals, grammar, nullable, first, follow):
     Return a dictionary mapping rules to their SELECT (a.k.a. PREDICT) set
     """
     select = dict()
-    #
-    # --- FILL IN HERE IN QUESTION 1 ---
-    #
+    #print "nullable: ", nullable
+    for head, body in grammar:
+        #print body
+
+        
+        #calculate "first" of body.
+        firstbody = set()
+        for i in range(0,len(body)):
+            prefix = set (body [0:i])
+            #add first(Ai) to first of body, if all starts before Ai are nullable
+            #this includes the first symbol.
+            if (prefix <= nullable and len(prefix)>0) or (i==0):
+                firstbody = firstbody | first [body[i]]
+
+                
+        if not (set(body) <= nullable):
+            #print "body is not nullable"
+            select [(head, body)] = firstbody
+        else:
+            select [(head, body)] = firstbody | follow [head]
+            #print "body is nullable"
+        
     return select
 
 
@@ -215,25 +234,25 @@ def analyze_grammar(grammar):
         print "follow({}) = {}".format(k, follow[k])
     print
 
-    # select = calculate_select(terminals, nonterminals, grammar, nullable, first, follow)
-    # for k in sorted(select.keys()):
-        # print "select({}) = {}".format(format_rule(k), select[k])
-    # print
+    select = calculate_select(terminals, nonterminals, grammar, nullable, first, follow)
+    for k in sorted(select.keys()):
+        print "select({}) = {}".format(format_rule(k), select[k])
+    print
 
-    # ll1 = True
-    # n = len(grammar)
-    # for i in range(n):
-        # for j in range(i+1, n):
-            # r1 = grammar[i]
-            # r2 = grammar[j]
-            # if r1[0] == r2[0] and len(select[r1] & select[r2]) > 0:
-                # ll1 = False
-                # print "Grammar is not LL(1), as the following rules have intersecting SELECT sets:"
-                # print "    " + format_rule(r1)
-                # print "    " + format_rule(r2)
-    # if ll1:
-        # print "Grammar is LL(1)."
-    # print
+    ll1 = True
+    n = len(grammar)
+    for i in range(n):
+        for j in range(i+1, n):
+            r1 = grammar[i]
+            r2 = grammar[j]
+            if r1[0] == r2[0] and len(select[r1] & select[r2]) > 0:
+                ll1 = False
+                print "Grammar is not LL(1), as the following rules have intersecting SELECT sets:"
+                print "    " + format_rule(r1)
+                print "    " + format_rule(r2)
+    if ll1:
+        print "Grammar is LL(1)."
+    print
 
 
 grammar_json_4a = [
