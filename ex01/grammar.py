@@ -129,12 +129,14 @@ def calculate_follow(terminals, nonterminals, grammar, nullable, first):
                     follow [body[i]] = follow [body[i]] | follow[head]
 
             #iterate on all starts
-            for i in range(0, len(body)-1) :
+            n = len(body)
+            for i in range(0, n-1) :   #0 to n-2
                 print "i:",i
-                for j in range (i+1, len(body)):
+                for j in range (i+1, n):
                     print "j:",j
                     null_prefix = set (body [i+1:j])
-                    print "set: " , null_prefix
+                    print "rule:" , body
+                    print "prefix: " , null_prefix
                     if (null_prefix <= nullable):
                         #add first (Aj) to follow (Ai)
                         print "body[j]", body[j]
