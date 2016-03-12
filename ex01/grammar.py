@@ -119,28 +119,31 @@ def calculate_follow(terminals, nonterminals, grammar, nullable, first):
 
             #iterate on all possible endings of rule A.
             #if ending is nullable then follow(A) can be added to Ai
-            for i in range(0, len(body)-1) :
+            for i in range(0, len(body)) :
                 ending = set (body [i+1:len(body)])
-                print ending
+                #print ending
                 
-                if (ending <= nullable and len(ending)>0):
-                    print "the ending " , ending , "is nullable"
+                if (ending <= nullable ) :
+                    #print "the ending " , ending , "is nullable"
                     #add follow (A) to follow (Ai)
-                    follow [body[i]] = follow [body[i]] | follow[head]
-
+                    if (body[i] in nonterminals) and not (follow[head] <= follow [body[i]]):
+                        #print "adding", follow[head]
+                        follow [body[i]] = follow [body[i]] | follow[head]
+                        changing = True
+                    
             #iterate on all starts
             n = len(body)
             for i in range(0, n-1) :   #0 to n-2
-                print "i:",i
+                #print "i:",i
                 for j in range (i+1, n):
-                    print "j:",j
+                    #print "j:",j
                     null_prefix = set (body [i+1:j])
-                    print "rule:" , body
-                    print "prefix: " , null_prefix
+                    #print "rule:" , body
+                    #print "prefix: " , null_prefix
                     if (null_prefix <= nullable):
                         #add first (Aj) to follow (Ai)
-                        print "body[j]", body[j]
-                        print "body[i]", body[i]
+                        #print "body[j]", body[j]
+                        #print "body[i]", body[i]
                         if (body[i] in nonterminals) and not (first[body[j]] <= follow [body[i]]):
                             follow [body[i]] = follow [body[i]] | first[body[j]]
                             changing = True
