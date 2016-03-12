@@ -24,6 +24,20 @@ grammar_recitation = [
 ]
 
 
+## test grammar - E has nullable start (T)
+##grammar_recitation = [
+##    (S, (ID, ASSIGN, E)),              # S -> id := E
+##    (S, (IF, LP, E, RP, S, ELSE, S)),  # S -> if (E) S else S
+##    (E, (T, EP)),                      # E -> T EP
+##    (T, (ID,)),                        # T -> id
+##    (T, (LP, E, RP)),                  # T -> (E)
+##    (T, ()),                           # T -> epsilon
+##    (EP, ()),                          # EP -> epsilon
+##    (EP, (PLUS, E)),                   # EP -> + E
+##]
+
+
+
 def calculate_nullable(terminals, nonterminals, grammar):
     """
     Return the set of nullable nonterminals in the given grammar.
@@ -59,11 +73,31 @@ def calculate_first(terminals, nonterminals, grammar, nullable):
     changing = True
     while changing:
         changing = False
+        
+	#for each rule A -> A1, ... , An
         for head, body in grammar:
-            #
-            # --- FILL IN HERE IN QUESTION 1 ---
-            #
-            pass
+  
+            #try iterating on all nullable starts .
+            for i in range(0, len(body)) :
+                #print body [0:i]
+                my_set = set (body [0:i])
+                #add first(i) to first (A), if all starts before i are nullable
+                #this includes the first symbol.
+                if (my_set <= nullable and len(my_set)>0) or (i==0):
+
+##                    #debug print
+##                    if (i>0):
+##                        print "this start is nullable" , my_set
+##                        
+		    #add 'first' of next token to first of this rule.
+##                    print "add to first of group : ", head , ". group is:",  first[head]
+##                    print "new member is : ", first [body[i]]
+                    if not (first [body[i]] <= first[head]):
+                        first[head] = first[head] | first [body[i]]
+##                        print "set after change : ",  first[head]
+                        changing = True
+        				
+            
     return first
 
 
@@ -76,9 +110,39 @@ def calculate_follow(terminals, nonterminals, grammar, nullable, first):
         follow[a] = set()
     start_nonterminal = grammar[0][0]
     follow[start_nonterminal] = {EOF}
-    #
-    # --- FILL IN HERE IN QUESTION 1 ---
-    #
+    changing = True
+    while changing:
+        changing = False
+        
+        #for each rule A -> A1, ... , An
+        for head, body in grammar:
+
+            #iterate on all possible endings of rule A.
+            #if ending is nullable then follow(A) can be added to Ai
+            for i in range(0, len(body)-1) :
+                ending = set (body [i+1:len(body)])
+                print ending
+                
+                if (ending <= nullable and len(ending)>0):
+                    print "the ending " , ending , "is nullable"
+                    #add follow (A) to follow (Ai)
+                    follow [body[i]] = follow [body[i]] | follow[head]
+
+            #iterate on all starts
+            for i in range(0, len(body)-1) :
+                print "i:",i
+                for j in range (i+1, len(body)):
+                    print "j:",j
+                    null_prefix = set (body [i+1:j])
+                    print "set: " , null_prefix
+                    if (null_prefix <= nullable):
+                        #add first (Aj) to follow (Ai)
+                        print "body[j]", body[j]
+                        print "body[i]", body[i]
+                        if (body[i] in nonterminals) and not (first[body[j]] <= follow [body[i]]):
+                            follow [body[i]] = follow [body[i]] | first[body[j]]
+                            changing = True
+
     return follow
 
 
@@ -146,25 +210,25 @@ def analyze_grammar(grammar):
         print "follow({}) = {}".format(k, follow[k])
     print
 
-    select = calculate_select(terminals, nonterminals, grammar, nullable, first, follow)
-    for k in sorted(select.keys()):
-        print "select({}) = {}".format(format_rule(k), select[k])
-    print
+    # select = calculate_select(terminals, nonterminals, grammar, nullable, first, follow)
+    # for k in sorted(select.keys()):
+        # print "select({}) = {}".format(format_rule(k), select[k])
+    # print
 
-    ll1 = True
-    n = len(grammar)
-    for i in range(n):
-        for j in range(i+1, n):
-            r1 = grammar[i]
-            r2 = grammar[j]
-            if r1[0] == r2[0] and len(select[r1] & select[r2]) > 0:
-                ll1 = False
-                print "Grammar is not LL(1), as the following rules have intersecting SELECT sets:"
-                print "    " + format_rule(r1)
-                print "    " + format_rule(r2)
-    if ll1:
-        print "Grammar is LL(1)."
-    print
+    # ll1 = True
+    # n = len(grammar)
+    # for i in range(n):
+        # for j in range(i+1, n):
+            # r1 = grammar[i]
+            # r2 = grammar[j]
+            # if r1[0] == r2[0] and len(select[r1] & select[r2]) > 0:
+                # ll1 = False
+                # print "Grammar is not LL(1), as the following rules have intersecting SELECT sets:"
+                # print "    " + format_rule(r1)
+                # print "    " + format_rule(r2)
+    # if ll1:
+        # print "Grammar is LL(1)."
+    # print
 
 
 grammar_json_4a = [
