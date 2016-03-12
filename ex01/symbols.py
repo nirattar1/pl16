@@ -39,6 +39,8 @@ obj = 'obj'
 members = 'members'
 keyvalue = 'keyvalue'
 value = 'value'
+obj_body = 'obj_body'
+after_keyvalue = 'after_keyvalue'
 
 #
 # --- ADD MORE NONTERMINALS HERE IF NEEDED IN QUESTION 4
