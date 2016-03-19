@@ -76,17 +76,17 @@ class JsonParser(Parser):
 
         --- DO NOT MODIFY THIS FUNCTION ---
         """
-        result = self.parse_main()
+        result = self.parse_json_root()
         self.match(EOF)
         return result
 
-    def parse_main(self):
+    def parse_json_root(self):
         if self.t in [LB]:
             c1 = self.parse_obj()
-            return (main, (c1,))
+            return (json_root, (c1,))
         elif self.t in [LS]:
             c1 = self.parse_arr()
-            return (main, (c1,))
+            return (json_root, (c1,))
         else:
             raise SyntaxError("Syntax error: no rule for token: {}".format(self.t))
 
@@ -95,11 +95,32 @@ class JsonParser(Parser):
             c1 = self.match(LS)
             c2 = self.parse_value_list()
             c3 = self.match(RS)
-            return (main, (c1,c2,c3))
+            return (arr, (c1,c2,c3))
         else:
             raise SyntaxError("Syntax error: no rule for token: {}".format(self.t))
      
+    def parse_value_list(self):
+        if self.t in [INT, STRING, LB, LS]:
+            c1 = self.parse_value()
+            c2 = self.parse_after_value()            
+            return (value_list, (c1,c2))
+        if self.t in [RS]:
+            return (value_list, ())        
+        else:
+            raise SyntaxError("Syntax error: no rule for token: {}".format(self.t))
      
+    def parse_after_value (self):
+        if self.t in [COMMA]:
+            c1 = self.match(COMMA)
+            c2 = self.parse_value_list()            
+            return (after_value, (c1,c2))
+        if self.t in [RS]:
+            return (after_value, ())        
+        else:
+            raise SyntaxError("Syntax error: no rule for token: {}".format(self.t))
+     
+
+        
     def parse_keyvalue(self):
         """
         An example parse_<nonterminal> function.
@@ -132,8 +153,6 @@ class JsonParser(Parser):
             return (obj_body, (c1,))
         else:
             raise SyntaxError("Syntax error: no rule for token: {}".format(self.t))
-     
-
 		
     def parse_value(self):
         if self.t in [INT]:
@@ -145,6 +164,9 @@ class JsonParser(Parser):
         elif self.t in [LB]:
             c1 = self.parse_obj()
             return (value, (c1,))
+        elif self.t in [LS]:
+            c1 = self.parse_arr()
+            return (value, (c1,))        
         else:
             raise SyntaxError("Syntax error: no rule for token: {}".format(self.t))
 
@@ -200,6 +222,16 @@ def main():
 ##    dot = tree_to_dot(parse_tree)
 ##    open('json_example_empty.gv', 'w').write(dot)
 ##    view(dot) 
+
+
+    json_example = open('json_array_example.json').read()
+    print json_example
+    tokens = lex(json_example)
+    parser = JsonParser(tokens)
+    parse_tree = parser.parse()
+    dot = tree_to_dot(parse_tree)
+    open('json_array_example.gv', 'w').write(dot)
+    view(dot) 
 
 
 if __name__ == '__main__':

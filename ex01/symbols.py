@@ -43,7 +43,7 @@ obj_body = 'obj_body'
 after_keyvalue = 'after_keyvalue'
 
 #question 6 non-terminals
-main = 'main'
+json_root = 'json_root'
 arr = 'arr'
 value_list = 'value_list'
 after_value = 'after_value'

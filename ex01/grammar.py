@@ -293,8 +293,8 @@ grammar_json_4c = [
 ]
 
 grammar_json_6 = [
-    (main , (obj,)),
-    (main , (arr,)),
+    (json_root , (obj,)),
+    (json_root , (arr,)),
     (arr , (LS,value_list,RS)),
     (value_list , ()),
     (value_list , (value,after_value)),
