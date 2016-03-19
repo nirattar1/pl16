@@ -158,14 +158,28 @@ def main():
     tokens = lex(json_example)
     parser = JsonParser(tokens)
     parse_tree = parser.parse()
-    print parse_tree
+    #print parse_tree
     dot = tree_to_dot(parse_tree)
     open('json_example.gv', 'w').write(dot)
     view(dot)
 
-    #
-    # --- MODIFY HERE TO ADD MORE TEST CASES ---
-    #
+    #test cases:
+    
+##    json_example = open('json_bad_example.json').read()
+##    print json_example
+##    tokens = lex(json_example)
+##    parser = JsonParser(tokens)
+##    parse_tree = parser.parse()
+##  
+
+##    json_example = open('json_example_empty.json').read()
+##    print json_example
+##    tokens = lex(json_example)
+##    parser = JsonParser(tokens)
+##    parse_tree = parser.parse()
+##    dot = tree_to_dot(parse_tree)
+##    open('json_example_empty.gv', 'w').write(dot)
+##    view(dot) 
 
 
 if __name__ == '__main__':
