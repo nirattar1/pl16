@@ -76,10 +76,30 @@ class JsonParser(Parser):
 
         --- DO NOT MODIFY THIS FUNCTION ---
         """
-        result = self.parse_obj()
+        result = self.parse_main()
         self.match(EOF)
         return result
 
+    def parse_main(self):
+        if self.t in [LB]:
+            c1 = self.parse_obj()
+            return (main, (c1,))
+        elif self.t in [LS]:
+            c1 = self.parse_arr()
+            return (main, (c1,))
+        else:
+            raise SyntaxError("Syntax error: no rule for token: {}".format(self.t))
+
+    def parse_arr(self):
+        if self.t in [LS]:
+            c1 = self.match(LS)
+            c2 = self.parse_value_list()
+            c3 = self.match(RS)
+            return (main, (c1,c2,c3))
+        else:
+            raise SyntaxError("Syntax error: no rule for token: {}".format(self.t))
+     
+     
     def parse_keyvalue(self):
         """
         An example parse_<nonterminal> function.

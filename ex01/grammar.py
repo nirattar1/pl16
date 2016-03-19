@@ -292,10 +292,26 @@ grammar_json_4c = [
    (value, (obj,))
 ]
 
-grammar_json__6 = [
-    #
-    # --- FILL IN HERE IN QUESTION 6 ---
-    #
+grammar_json_6 = [
+    (main , (obj,)),
+    (main , (arr,)),
+    (arr , (LS,value_list,RS)),
+    (value_list , ()),
+    (value_list , (value,after_value)),
+    (after_value , ()),
+    (after_value , (COMMA,value_list)),
+    (obj , (LB,obj_body)),
+    (obj_body , (members,RB)),
+    (obj_body , (RB,)),
+    (members , (keyvalue,after_keyvalue)),
+    (after_keyvalue , ()),
+    (after_keyvalue , (COMMA,members)),
+    (keyvalue , (STRING,COLON,value)),
+    (value , (STRING,)),
+    (value , (INT,)),
+    (value , (obj,)),
+    (value , (arr,)),
+
 ]
 
 
@@ -314,8 +330,8 @@ def main():
     analyze_grammar(grammar_json_4c)
     print
     
-    # analyze_grammar(grammar_json_6)
-    # print
+    analyze_grammar(grammar_json_6)
+    print
 
     #
     # --- ADD MORE TEST CASES HERE ---

@@ -42,6 +42,12 @@ value = 'value'
 obj_body = 'obj_body'
 after_keyvalue = 'after_keyvalue'
 
+#question 6 non-terminals
+main = 'main'
+arr = 'arr'
+value_list = 'value_list'
+after_value = 'after_value'
+
 #
 # --- ADD MORE NONTERMINALS HERE IF NEEDED IN QUESTION 4
 #
