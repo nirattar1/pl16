@@ -95,15 +95,59 @@ class JsonParser(Parser):
             raise SyntaxError("Syntax error: no rule for token: {}".format(self.t))
 
     def parse_obj(self):
-        #
-        # --- CHANGE THE BODY OF THIS FUNCTION ---
-        #
-        pass
+        if self.t in [LB]:
+            c1 = self.match(LB)
+            c2 = self.parse_obj_body()
+            return (obj, (c1, c2))
+        else:
+            raise SyntaxError("Syntax error: no rule for token: {}".format(self.t))
+     
+    def parse_obj_body(self):
+        if self.t in [STRING]:
+            c1 = self.parse_members()
+            c2 = self.match(RB)
+            return (obj_body, (c1, c2))
+        elif self.t in [RB]:
+            c1 = self.match(RB)
+            return (obj_body, (c1,))
+        else:
+            raise SyntaxError("Syntax error: no rule for token: {}".format(self.t))
+     
 
-    #
-    # --- FILL IN MORE parse_XXX FUNCTIONS HERE ---
-    #
+		
+    def parse_value(self):
+        if self.t in [INT]:
+            c1 = self.match(INT)
+            return (value, (c1,))
+        elif self.t in [STRING]:
+            c1 = self.match(STRING)
+            return (value, (c1,))
+        elif self.t in [LB]:
+            c1 = self.parse_obj()
+            return (value, (c1,))
+        else:
+            raise SyntaxError("Syntax error: no rule for token: {}".format(self.t))
 
+    def parse_after_keyvalue(self):
+        if self.t in [COMMA]:
+            c1 = self.match(COMMA)
+            c2 = self.parse_members()
+            return (after_keyvalue, (c1, c2))
+        elif self.t in [RB]:
+            return (after_keyvalue, ())
+        else:
+            raise SyntaxError("Syntax error: no rule for token: {}".format(self.t))
+
+
+    def parse_members(self):
+        if self.t in [STRING]:
+            c1 = self.parse_keyvalue()
+            c2 = self.parse_after_keyvalue()
+            return (members, (c1, c2))
+        else:
+            raise SyntaxError("Syntax error: no rule for token: {}".format(self.t))
+    
+    
 
 def main():
     from lexer import lex
@@ -114,13 +158,28 @@ def main():
     tokens = lex(json_example)
     parser = JsonParser(tokens)
     parse_tree = parser.parse()
+    #print parse_tree
     dot = tree_to_dot(parse_tree)
     open('json_example.gv', 'w').write(dot)
     view(dot)
 
-    #
-    # --- MODIFY HERE TO ADD MORE TEST CASES ---
-    #
+    #test cases:
+    
+##    json_example = open('json_bad_example.json').read()
+##    print json_example
+##    tokens = lex(json_example)
+##    parser = JsonParser(tokens)
+##    parse_tree = parser.parse()
+##  
+
+##    json_example = open('json_example_empty.json').read()
+##    print json_example
+##    tokens = lex(json_example)
+##    parser = JsonParser(tokens)
+##    parse_tree = parser.parse()
+##    dot = tree_to_dot(parse_tree)
+##    open('json_example_empty.gv', 'w').write(dot)
+##    view(dot) 
 
 
 if __name__ == '__main__':
